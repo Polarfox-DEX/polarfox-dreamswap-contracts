@@ -8,16 +8,16 @@ import "./libs/SafeBEP20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import "./HoneyToken.sol";
+import "./CloutToken.sol";
 
-// QueenBee is the master of Honey. She can make Honey and she is a fair and lovely woman.
+// MasterChef is the master of Clout. She can make Clout and she is a fair and lovely woman.
 //
 // Note that it's ownable and the owner wields tremendous power. The ownership
-// will be transferred to a governance smart contract once Honey is sufficiently
+// will be transferred to a governance smart contract once Clout is sufficiently
 // distributed and the community can show to govern itself.
 //
 // Have fun reading it. Hopefully it's bug-free. God bless.
-contract QueenBee is Ownable, ReentrancyGuard {
+contract MasterChef is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
 
@@ -26,13 +26,13 @@ contract QueenBee is Ownable, ReentrancyGuard {
         uint256 amount;         // How many LP tokens the user has provided.
         uint256 rewardDebt;     // Reward debt. See explanation below.
         //
-        // We do some fancy math here. Basically, any point in time, the amount of Honeys
+        // We do some fancy math here. Basically, any point in time, the amount of Clouts
         // entitled to a user but is pending to be distributed is:
         //
-        //   pending reward = (user.amount * pool.accHoneyPerShare) - user.rewardDebt
+        //   pending reward = (user.amount * pool.accCloutPerShare) - user.rewardDebt
         //
         // Whenever a user deposits or withdraws LP tokens to a pool. Here's what happens:
-        //   1. The pool's `accHoneyPerShare` (and `lastRewardBlock`) gets updated.
+        //   1. The pool's `accCloutPerShare` (and `lastRewardBlock`) gets updated.
         //   2. User receives the pending reward sent to his/her address.
         //   3. User's `amount` gets updated.
         //   4. User's `rewardDebt` gets updated.
@@ -41,19 +41,19 @@ contract QueenBee is Ownable, ReentrancyGuard {
     // Info of each pool.
     struct PoolInfo {
         IBEP20 lpToken;           // Address of LP token contract.
-        uint256 allocPoint;       // How many allocation points assigned to this pool. Honeys to distribute per block.
-        uint256 lastRewardBlock;  // Last block number that Honeys distribution occurs.
-        uint256 accHoneyPerShare;   // Accumulated Honeys per share, times 1e12. See below.
+        uint256 allocPoint;       // How many allocation points assigned to this pool. Clouts to distribute per block.
+        uint256 lastRewardBlock;  // Last block number that Clouts distribution occurs.
+        uint256 accCloutPerShare;   // Accumulated Clouts per share, times 1e12. See below.
         uint16 depositFeeBP;      // Deposit fee in basis points
     }
 
-    // The Honey TOKEN!
-    HoneyToken public Honey;
+    // The Clout TOKEN!
+    CloutToken public Clout;
     // Dev address.
     address public devaddr;
-    // Honey tokens created per block.
-    uint256 public HoneyPerBlock;
-    // Bonus muliplier for early Honey makers.
+    // Clout tokens created per block.
+    uint256 public CloutPerBlock;
+    // Bonus muliplier for early Clout makers.
     uint256 public constant BONUS_MULTIPLIER = 1;
     // Deposit Fee address
     address public feeAddress;
@@ -64,7 +64,7 @@ contract QueenBee is Ownable, ReentrancyGuard {
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
-    // The block number when Honey mining starts.
+    // The block number when Clout mining starts.
     uint256 public startBlock;
 
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
@@ -72,19 +72,19 @@ contract QueenBee is Ownable, ReentrancyGuard {
     event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
     event SetFeeAddress(address indexed user, address indexed newAddress);
     event SetDevAddress(address indexed user, address indexed newAddress);
-    event UpdateEmissionRate(address indexed user, uint256 honeyPerBlock);
+    event UpdateEmissionRate(address indexed user, uint256 cloutPerBlock);
 
     constructor(
-        HoneyToken _Honey,
+        CloutToken _Clout,
         address _devaddr,
         address _feeAddress,
-        uint256 _HoneyPerBlock,
+        uint256 _CloutPerBlock,
         uint256 _startBlock
     ) public {
-        Honey = _Honey;
+        Clout = _Clout;
         devaddr = _devaddr;
         feeAddress = _feeAddress;
-        HoneyPerBlock = _HoneyPerBlock;
+        CloutPerBlock = _CloutPerBlock;
         startBlock = _startBlock;
     }
 
@@ -111,12 +111,12 @@ contract QueenBee is Ownable, ReentrancyGuard {
         lpToken : _lpToken,
         allocPoint : _allocPoint,
         lastRewardBlock : lastRewardBlock,
-        accHoneyPerShare : 0,
+        accCloutPerShare : 0,
         depositFeeBP : _depositFeeBP
         }));
     }
 
-    // Update the given pool's Honey allocation point and deposit fee. Can only be called by the owner.
+    // Update the given pool's Clout allocation point and deposit fee. Can only be called by the owner.
     function set(uint256 _pid, uint256 _allocPoint, uint16 _depositFeeBP, bool _withUpdate) public onlyOwner {
         require(_depositFeeBP <= 10000, "set: invalid deposit fee basis points");
         if (_withUpdate) {
@@ -132,18 +132,18 @@ contract QueenBee is Ownable, ReentrancyGuard {
         return _to.sub(_from).mul(BONUS_MULTIPLIER);
     }
 
-    // View function to see pending Honeys on frontend.
-    function pendingHoney(uint256 _pid, address _user) external view returns (uint256) {
+    // View function to see pending Clouts on frontend.
+    function pendingClout(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
-        uint256 accHoneyPerShare = pool.accHoneyPerShare;
+        uint256 accCloutPerShare = pool.accCloutPerShare;
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-            uint256 HoneyReward = multiplier.mul(HoneyPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-            accHoneyPerShare = accHoneyPerShare.add(HoneyReward.mul(1e12).div(lpSupply));
+            uint256 CloutReward = multiplier.mul(CloutPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+            accCloutPerShare = accCloutPerShare.add(CloutReward.mul(1e12).div(lpSupply));
         }
-        return user.amount.mul(accHoneyPerShare).div(1e12).sub(user.rewardDebt);
+        return user.amount.mul(accCloutPerShare).div(1e12).sub(user.rewardDebt);
     }
 
     // Update reward variables for all pools. Be careful of gas spending!
@@ -166,22 +166,22 @@ contract QueenBee is Ownable, ReentrancyGuard {
             return;
         }
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-        uint256 HoneyReward = multiplier.mul(HoneyPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-        Honey.mint(devaddr, HoneyReward.div(10));
-        Honey.mint(address(this), HoneyReward);
-        pool.accHoneyPerShare = pool.accHoneyPerShare.add(HoneyReward.mul(1e12).div(lpSupply));
+        uint256 CloutReward = multiplier.mul(CloutPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+        Clout.mint(devaddr, CloutReward.div(10));
+        Clout.mint(address(this), CloutReward);
+        pool.accCloutPerShare = pool.accCloutPerShare.add(CloutReward.mul(1e12).div(lpSupply));
         pool.lastRewardBlock = block.number;
     }
 
-    // Deposit LP tokens to QueenBee for Honey allocation.
+    // Deposit LP tokens to MasterChef for Clout allocation.
     function deposit(uint256 _pid, uint256 _amount) public nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
         if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accHoneyPerShare).div(1e12).sub(user.rewardDebt);
+            uint256 pending = user.amount.mul(pool.accCloutPerShare).div(1e12).sub(user.rewardDebt);
             if (pending > 0) {
-                safeHoneyTransfer(msg.sender, pending);
+                safeCloutTransfer(msg.sender, pending);
             }
         }
         if (_amount > 0) {
@@ -194,25 +194,25 @@ contract QueenBee is Ownable, ReentrancyGuard {
                 user.amount = user.amount.add(_amount);
             }
         }
-        user.rewardDebt = user.amount.mul(pool.accHoneyPerShare).div(1e12);
+        user.rewardDebt = user.amount.mul(pool.accCloutPerShare).div(1e12);
         emit Deposit(msg.sender, _pid, _amount);
     }
 
-    // Withdraw LP tokens from QueenBee.
+    // Withdraw LP tokens from MasterChef.
     function withdraw(uint256 _pid, uint256 _amount) public nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         require(user.amount >= _amount, "withdraw: not good");
         updatePool(_pid);
-        uint256 pending = user.amount.mul(pool.accHoneyPerShare).div(1e12).sub(user.rewardDebt);
+        uint256 pending = user.amount.mul(pool.accCloutPerShare).div(1e12).sub(user.rewardDebt);
         if (pending > 0) {
-            safeHoneyTransfer(msg.sender, pending);
+            safeCloutTransfer(msg.sender, pending);
         }
         if (_amount > 0) {
             user.amount = user.amount.sub(_amount);
             pool.lpToken.safeTransfer(address(msg.sender), _amount);
         }
-        user.rewardDebt = user.amount.mul(pool.accHoneyPerShare).div(1e12);
+        user.rewardDebt = user.amount.mul(pool.accCloutPerShare).div(1e12);
         emit Withdraw(msg.sender, _pid, _amount);
     }
 
@@ -227,16 +227,16 @@ contract QueenBee is Ownable, ReentrancyGuard {
         emit EmergencyWithdraw(msg.sender, _pid, amount);
     }
 
-    // Safe Honey transfer function, just in case if rounding error causes pool to not have enough Honeys.
-    function safeHoneyTransfer(address _to, uint256 _amount) internal {
-        uint256 HoneyBal = Honey.balanceOf(address(this));
+    // Safe Clout transfer function, just in case if rounding error causes pool to not have enough Clouts.
+    function safeCloutTransfer(address _to, uint256 _amount) internal {
+        uint256 CloutBal = Clout.balanceOf(address(this));
         bool transferSuccess = false;
-        if (_amount > HoneyBal) {
-            transferSuccess = Honey.transfer(_to, HoneyBal);
+        if (_amount > CloutBal) {
+            transferSuccess = Clout.transfer(_to, CloutBal);
         } else {
-            transferSuccess = Honey.transfer(_to, _amount);
+            transferSuccess = Clout.transfer(_to, _amount);
         }
-        require(transferSuccess, "safeHoneyTransfer: transfer failed");
+        require(transferSuccess, "safeCloutTransfer: transfer failed");
     }
 
     // Update dev address by the previous dev.
@@ -253,9 +253,9 @@ contract QueenBee is Ownable, ReentrancyGuard {
     }
 
     //Pancake has to add hidden dummy pools inorder to alter the emission, here we make it simple and transparent to all.
-    function updateEmissionRate(uint256 _HoneyPerBlock) public onlyOwner {
+    function updateEmissionRate(uint256 _CloutPerBlock) public onlyOwner {
         massUpdatePools();
-        HoneyPerBlock = _HoneyPerBlock;
-        emit UpdateEmissionRate(msg.sender, _HoneyPerBlock);
+        CloutPerBlock = _CloutPerBlock;
+        emit UpdateEmissionRate(msg.sender, _CloutPerBlock);
     }
 }
