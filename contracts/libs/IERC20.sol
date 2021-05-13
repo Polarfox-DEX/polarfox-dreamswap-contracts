@@ -1,6 +1,6 @@
 pragma solidity >=0.6.4;
 
-interface IBEP20 {
+interface IERC20 {
     /**
      * @dev Returns the amount of tokens in existence.
      */

@@ -2,10 +2,10 @@
 
 pragma solidity 0.6.12;
 
-import "./libs/BEP20.sol";
+import "./libs/ERC20.sol";
 
-// CloutToken with Governance.
-contract CloutToken is BEP20('CLOUT', 'CLOUT') {
+// DreamToken with Governance.
+contract DreamToken is ERC20('DREAM', 'DREAM') {
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
@@ -114,9 +114,9 @@ contract CloutToken is BEP20('CLOUT', 'CLOUT') {
         );
 
         address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), "CLOUT::delegateBySig: invalid signature");
-        require(nonce == nonces[signatory]++, "CLOUT::delegateBySig: invalid nonce");
-        require(now <= expiry, "CLOUT::delegateBySig: signature expired");
+        require(signatory != address(0), "DREAM::delegateBySig: invalid signature");
+        require(nonce == nonces[signatory]++, "DREAM::delegateBySig: invalid nonce");
+        require(now <= expiry, "DREAM::delegateBySig: signature expired");
         return _delegate(signatory, delegatee);
     }
 
@@ -146,7 +146,7 @@ contract CloutToken is BEP20('CLOUT', 'CLOUT') {
         view
         returns (uint256)
     {
-        require(blockNumber < block.number, "CLOUT::getPriorVotes: not yet determined");
+        require(blockNumber < block.number, "DREAM::getPriorVotes: not yet determined");
 
         uint32 nCheckpoints = numCheckpoints[account];
         if (nCheckpoints == 0) {
@@ -183,7 +183,7 @@ contract CloutToken is BEP20('CLOUT', 'CLOUT') {
         internal
     {
         address currentDelegate = _delegates[delegator];
-        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying CLOUTs (not scaled);
+        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying DREAMs (not scaled);
         _delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);
@@ -219,7 +219,7 @@ contract CloutToken is BEP20('CLOUT', 'CLOUT') {
     )
         internal
     {
-        uint32 blockNumber = safe32(block.number, "CLOUT::_writeCheckpoint: block number exceeds 32 bits");
+        uint32 blockNumber = safe32(block.number, "DREAM::_writeCheckpoint: block number exceeds 32 bits");
 
         if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber) {
             checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
