@@ -1,5 +1,5 @@
 async function main() {
-  const DreamToken = await ethers.getContractFactory("dreamToken");
+  const DreamToken = await ethers.getContractFactory("DreamToken");
   // Start deployment, returning a promise that resolves to a contract object
   const dreamToken = await DreamToken.deploy();
   
