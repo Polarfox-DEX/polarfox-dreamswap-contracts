@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+<<<<<<< HEAD
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -7,6 +8,15 @@ import "./libs/IERC20.sol";
 import "./libs/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+=======
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+>>>>>>> 2621b54016c73e5aa13980defe4514a911855768
 
 import "./DreamToken.sol";
 

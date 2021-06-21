@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+<<<<<<< HEAD
 pragma solidity 0.6.12;
 
 import "./libs/ERC20.sol";
@@ -8,6 +9,19 @@ import "./libs/ERC20.sol";
 contract DreamToken is ERC20('DREAM', 'DREAM') {
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
+=======
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+
+// DreamToken with Governance.
+contract DreamToken is ERC20('DREAM', 'DREAM'), Ownable {
+  using SafeMath for uint256;
+    /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
+    function mint(address _to, uint256 _amount) external onlyOwner {
+>>>>>>> 2621b54016c73e5aa13980defe4514a911855768
         _mint(_to, _amount);
         _moveDelegates(address(0), _delegates[_to], _amount);
     }
@@ -114,9 +128,17 @@ contract DreamToken is ERC20('DREAM', 'DREAM') {
         );
 
         address signatory = ecrecover(digest, v, r, s);
+<<<<<<< HEAD
         require(signatory != address(0), "DREAM::delegateBySig: invalid signature");
         require(nonce == nonces[signatory]++, "DREAM::delegateBySig: invalid nonce");
         require(now <= expiry, "DREAM::delegateBySig: signature expired");
+=======
+        require(signatory != address(0), 
+            "DREAM::delegateBySig: invalid signature"
+        );
+        require(nonce == nonces[signatory]++, "DREAM::delegateBySig: invalid nonce");
+        require(block.timestamp <= expiry, "DREAM::delegateBySig: signature expired");
+>>>>>>> 2621b54016c73e5aa13980defe4514a911855768
         return _delegate(signatory, delegatee);
     }
 
@@ -236,7 +258,11 @@ contract DreamToken is ERC20('DREAM', 'DREAM') {
         return uint32(n);
     }
 
+<<<<<<< HEAD
     function getChainId() internal pure returns (uint) {
+=======
+    function getChainId() internal view returns (uint) {
+>>>>>>> 2621b54016c73e5aa13980defe4514a911855768
         uint256 chainId;
         assembly { chainId := chainid() }
         return chainId;
