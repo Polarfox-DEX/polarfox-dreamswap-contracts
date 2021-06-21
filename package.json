@@ -1,7 +1,21 @@
 {
   "name": "dreamswap",
+  "version": "1.0.0",
+  "description": "Smart contracts and interfaces for Dreamswap",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "ethers": "^5.1.4",
+    "hardhat": "^2.1.2"
+  },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.1.0",
-    "dotenv": "^10.0.0"
+    "@alch/alchemy-web3": "^1.0.2",
+    "@openzeppelin/contracts": "4.1.0",
+    "dotenv": "^8.2.0"
   }
 }
